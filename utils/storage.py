@@ -4,7 +4,7 @@ Cloud storage abstraction layer.
 Provides a single interface (upload_file / delete_file) regardless of which
 backend is configured via STORAGE_PROVIDER: "firebase", "s3", or "local".
 
-Only the resulting URL is ever stored in MongoDB — the raw file bytes live in
+Only the resulting URL is ever stored in MongoDB -- the raw file bytes live in
 cloud storage (or the local uploads/ folder as a dev fallback).
 """
 import os
@@ -20,10 +20,6 @@ def _unique_filename(original_filename):
 
 
 def upload_file(file_storage, subfolder="resumes"):
-    """
-    Upload a werkzeug FileStorage object to the configured provider.
-    Returns dict: { url, storage_path, file_type, file_size }
-    """
     provider = current_app.config["STORAGE_PROVIDER"]
     filename = _unique_filename(file_storage.filename)
     file_storage.stream.seek(0, os.SEEK_END)
@@ -51,9 +47,6 @@ def delete_file(storage_path):
         _delete_local(storage_path)
 
 
-# ---------------------------------------------------------------------
-# Local filesystem (development fallback)
-# ---------------------------------------------------------------------
 def _upload_local(file_storage, subfolder, filename):
     folder = os.path.join(current_app.config["LOCAL_UPLOAD_FOLDER"], subfolder)
     os.makedirs(folder, exist_ok=True)
@@ -70,15 +63,19 @@ def _delete_local(storage_path):
         os.remove(full_path)
 
 
-# ---------------------------------------------------------------------
-# Firebase Storage
-# ---------------------------------------------------------------------
 def _get_firebase_bucket():
+    import json
     import firebase_admin
     from firebase_admin import credentials, storage
 
     if not firebase_admin._apps:
-        cred = credentials.Certificate(current_app.config["FIREBASE_CREDENTIALS_JSON"])
+        raw = current_app.config["FIREBASE_CREDENTIALS_JSON"]
+        try:
+            cred_dict = json.loads(raw)
+            cred = credentials.Certificate(cred_dict)
+        except (json.JSONDecodeError, TypeError):
+            cred = credentials.Certificate(raw)
+
         firebase_admin.initialize_app(
             cred, {"storageBucket": current_app.config["FIREBASE_STORAGE_BUCKET"]}
         )
@@ -101,9 +98,6 @@ def _delete_firebase(storage_path):
         blob.delete()
 
 
-# ---------------------------------------------------------------------
-# AWS S3
-# ---------------------------------------------------------------------
 def _get_s3_client():
     import boto3
 
