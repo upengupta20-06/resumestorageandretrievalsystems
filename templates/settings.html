@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% set active_page = 'settings' %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h4 class="section-title">Settings</h4>
+    <p class="section-subtitle">Manage your profile, security, and preferences</p>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card mb-3">
+      <div class="card-header">Profile</div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('settings.update_profile') }}">
+<<<<<<< HEAD
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+=======
+>>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
+          <div class="mb-3">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="name" value="{{ user.name }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" value="{{ user.email }}">
+          </div>
+          <button type="submit" class="btn btn-primary text-white btn-sm">Save Profile</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Change Password</div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('settings.update_password') }}">
+<<<<<<< HEAD
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+=======
+>>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
+          <div class="mb-3"><input type="password" name="current_password" class="form-control" placeholder="Current password" required></div>
+          <div class="mb-3"><input type="password" name="new_password" class="form-control" placeholder="New password" minlength="8" required></div>
+          <div class="mb-3"><input type="password" name="confirm_password" class="form-control" placeholder="Confirm new password" minlength="8" required></div>
+          <button type="submit" class="btn btn-primary text-white btn-sm">Update Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card mb-3">
+      <div class="card-header">Notification Preferences</div>
+      <div class="card-body">
+        <form method="POST" action="{{ url_for('settings.update_notifications') }}">
+<<<<<<< HEAD
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+=======
+>>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
+          {% set prefs = user.notification_preferences or {} %}
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="email_on_upload" id="n1" {% if prefs.email_on_upload %}checked{% endif %}>
+            <label class="form-check-label" for="n1" style="font-size:13px;">Email me when a new resume is uploaded</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="email_on_shortlist" id="n2" {% if prefs.email_on_shortlist %}checked{% endif %}>
+            <label class="form-check-label" for="n2" style="font-size:13px;">Email me when a candidate is shortlisted</label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="weekly_summary" id="n3" {% if prefs.weekly_summary %}checked{% endif %}>
+            <label class="form-check-label" for="n3" style="font-size:13px;">Send weekly summary report</label>
+          </div>
+          <button type="submit" class="btn btn-primary text-white btn-sm">Save Preferences</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">Cloud Storage</div>
+      <div class="card-body" style="font-size:13px;">
+        <p class="text-muted-c mb-2">Cloud storage provider is configured via environment variables on the server (Firebase Storage or AWS S3). Contact your administrator to change providers.</p>
+        <span class="badge bg-light text-dark border">Provider: {{ config.STORAGE_PROVIDER if config is defined else 'local' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Resume Database{% endblock %}
+{% set active_page = 'database' %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h4 class="section-title">Resume Database</h4>
+    <p class="section-subtitle">Browse and manage all candidate resumes</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('resume.export_candidates', fmt='excel') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-file-excel me-1"></i>Excel</a>
+    <a href="{{ url_for('resume.export_candidates', fmt='pdf') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-file-pdf me-1"></i>PDF</a>
+    <a href="{{ url_for('resume.upload_resume') }}" class="btn btn-primary text-white btn-sm"><i class="fa-solid fa-plus me-1"></i>Upload</a>
+  </div>
+</div>
+
+<!-- Filter chips -->
+<form method="GET" class="d-flex flex-wrap gap-2 mb-3" id="filterForm">
+  <span class="filter-chip {{ 'active' if not department and not status }}" onclick="clearFilters()">All</span>
+  {% for d in ['Engineering','Design','Product','Marketing','Sales','HR','Finance','Operations'] %}
+    <span class="filter-chip {{ 'active' if department == d }}" onclick="setFilter('department','{{ d }}')">{{ d }}</span>
+  {% endfor %}
+  {% for s in ['New','Reviewed','Shortlisted','Rejected'] %}
+    <span class="filter-chip {{ 'active' if status == s }}" onclick="setFilter('status','{{ s }}')">{{ s }}</span>
+  {% endfor %}
+</form>
+
+<div class="card">
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th>Candidate</th><th>Email</th><th>Phone</th><th>Skills</th>
+          <th>Department</th><th>Experience</th><th>Upload Date</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in resumes %}
+        <tr>
+          <td>{{ r.name }}</td>
+          <td>{{ r.email }}</td>
+          <td>{{ r.phone }}</td>
+          <td>
+            {% for s in r.skills[:3] %}<span class="badge bg-light text-dark border me-1">{{ s }}</span>{% endfor %}
+            {% if r.skills|length > 3 %}<span class="text-muted-c" style="font-size:11px;">+{{ r.skills|length - 3 }}</span>{% endif %}
+          </td>
+          <td>{{ r.department }}</td>
+          <td>{{ r.experience_years }} yrs</td>
+          <td>{{ r.upload_date.strftime('%b %d, %Y') }}</td>
+          <td><span class="status-pill status-{{ r.status|lower }}">{{ r.status }}</span></td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{{ url_for('resume.resume_profile', resume_id=r._id) }}" class="btn btn-sm btn-outline-secondary" title="View"><i class="fa-solid fa-eye"></i></a>
+              <a href="{{ url_for('resume.download_resume', resume_id=r._id) }}" class="btn btn-sm btn-outline-secondary" title="Download"><i class="fa-solid fa-download"></i></a>
+              <a href="{{ url_for('resume.edit_resume', resume_id=r._id) }}" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="fa-solid fa-pen"></i></a>
+              <button class="btn btn-sm btn-outline-secondary text-danger" title="Delete"
+                data-bs-toggle="modal" data-bs-target="#deleteModal{{ r._id }}"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="modal fade" id="deleteModal{{ r._id }}" tabindex="-1">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: var(--radius);">
+                  <div class="modal-body p-4">
+                    <h6>Delete resume?</h6>
+                    <p class="text-muted-c" style="font-size:13px;">This will permanently remove {{ r.name }}'s resume. This cannot be undone.</p>
+                    <form method="POST" action="{{ url_for('resume.delete_resume_route', resume_id=r._id) }}">
+<<<<<<< HEAD
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+=======
+>>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
+                      <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger btn-sm text-white">Delete</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="empty-state"><i class="fa-solid fa-folder-open"></i>No resumes found for this filter.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if total_pages > 1 %}
+<nav class="mt-3">
+  <ul class="pagination justify-content-center">
+    {% for p in range(1, total_pages + 1) %}
+    <li class="page-item {{ 'active' if p == page }}">
+      <a class="page-link" href="?page={{ p }}&department={{ department }}&status={{ status }}">{{ p }}</a>
+    </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setFilter(key, value) {
+  const params = new URLSearchParams(window.location.search);
+  params.set(key, value);
+  params.set('page', 1);
+  window.location.search = params.toString();
+}
+function clearFilters() { window.location.search = ''; }
+</script>
+{% endblock %}

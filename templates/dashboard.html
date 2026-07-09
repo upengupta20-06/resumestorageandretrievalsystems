@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% set active_page = 'dashboard' %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h4 class="section-title">Dashboard</h4>
+    <p class="section-subtitle">Overview of resume pipeline and hiring activity</p>
+  </div>
+  <a href="{{ url_for('resume.upload_resume') }}" class="btn btn-primary text-white">
+    <i class="fa-solid fa-plus me-1"></i> Upload Resume
+  </a>
+</div>
+
+<!-- Stat cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon blue"><i class="fa-solid fa-file-lines"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.total }}</div>
+        <div class="stat-label">Total Resumes</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon green"><i class="fa-solid fa-arrow-trend-up"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.new_this_month }}</div>
+        <div class="stat-label">New This Month</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon amber"><i class="fa-solid fa-star"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.shortlisted }}</div>
+        <div class="stat-label">Shortlisted</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon slate"><i class="fa-solid fa-building"></i></div>
+      <div>
+        <div class="stat-value">{{ stats.department_count }}</div>
+        <div class="stat-label">Departments</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts -->
+<div class="row g-3 mb-4">
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Department-wise Applications</div>
+      <div class="card-body"><canvas id="deptChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Top Skills</div>
+      <div class="card-body"><canvas id="skillChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Monthly Uploads</div>
+      <div class="card-body"><canvas id="monthlyChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Experience-level Distribution</div>
+      <div class="card-body"><canvas id="expChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent uploads -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    Recent Uploads
+    <a href="{{ url_for('resume.resume_database') }}" style="font-size:12.5px;">View all</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table mb-0">
+      <thead>
+        <tr><th>Name</th><th>Department</th><th>Upload Date</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody id="recentUploadsBody">
+        {% for r in stats.recent_uploads %}
+        <tr>
+          <td>{{ r.name }}</td>
+          <td>{{ r.department }}</td>
+          <td>{{ r.upload_date.strftime('%b %d, %Y') }}</td>
+          <td><span class="status-pill status-{{ r.status|lower }}">{{ r.status }}</span></td>
+          <td><a href="{{ url_for('resume.resume_profile', resume_id=r._id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty-state"><i class="fa-solid fa-inbox"></i>No resumes uploaded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+fetch("{{ url_for('dashboard.api_dashboard_data') }}")
+  .then(r => r.json())
+  .then(data => {
+    const c = data.charts;
+    const palette = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#1E293B', '#64748B'];
+
+    new Chart(document.getElementById('deptChart'), {
+      type: 'doughnut',
+      data: {
+        labels: c.department.map(d => d._id || 'Unassigned'),
+        datasets: [{ data: c.department.map(d => d.count), backgroundColor: palette }]
+      },
+      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } } }
+    });
+
+    new Chart(document.getElementById('skillChart'), {
+      type: 'bar',
+      data: {
+        labels: c.skills.map(s => s._id),
+        datasets: [{ label: 'Candidates', data: c.skills.map(s => s.count), backgroundColor: '#3B82F6', borderRadius: 6 }]
+      },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+    });
+
+    new Chart(document.getElementById('monthlyChart'), {
+      type: 'line',
+      data: {
+        labels: c.monthly.map(m => `${m._id.m}/${m._id.y}`),
+        datasets: [{ label: 'Uploads', data: c.monthly.map(m => m.count), borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.3 }]
+      },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('expChart'), {
+      type: 'pie',
+      data: {
+        labels: c.experience.map(e => e._id),
+        datasets: [{ data: c.experience.map(e => e.count), backgroundColor: palette }]
+      },
+      options: { plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } } } }
+    });
+  });
+</script>
+{% endblock %}

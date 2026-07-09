@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% set active_page = 'analytics' %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h4 class="section-title">Analytics</h4>
+    <p class="section-subtitle">Recruitment pipeline insights and trends</p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon blue"><i class="fa-solid fa-file-lines"></i></div>
+      <div><div class="stat-value">{{ stats.total }}</div><div class="stat-label">Total Resumes</div></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon slate"><i class="fa-solid fa-building"></i></div>
+      <div><div class="stat-value">{{ stats.department_count }}</div><div class="stat-label">Departments</div></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon green"><i class="fa-solid fa-star"></i></div>
+      <div><div class="stat-value">{{ stats.shortlisted }}</div><div class="stat-label">Shortlisted</div></div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card h-100">
+      <div class="stat-icon amber"><i class="fa-solid fa-cloud"></i></div>
+      <div><div class="stat-value" id="storageValue">—</div><div class="stat-label">Storage Used (MB)</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Department Statistics</div>
+      <div class="card-body"><canvas id="deptChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Top Skills</div>
+      <div class="card-body"><canvas id="skillChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Resume Upload Trends</div>
+      <div class="card-body"><canvas id="monthlyChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card chart-card">
+      <div class="card-header">Experience Breakdown</div>
+      <div class="card-body"><canvas id="expChart"></canvas></div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div class="card chart-card">
+      <div class="card-header">Hiring Funnel</div>
+      <div class="card-body"><canvas id="funnelChart" style="max-height:220px;"></canvas></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+fetch("{{ url_for('analytics.api_analytics_data') }}")
+  .then(r => r.json())
+  .then(data => {
+    document.getElementById('storageValue').textContent = data.totals.storage_used_mb;
+    const palette = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#1E293B', '#64748B'];
+
+    new Chart(document.getElementById('deptChart'), {
+      type: 'bar',
+      data: { labels: data.department.map(d => d._id || 'Unassigned'), datasets: [{ data: data.department.map(d => d.count), backgroundColor: '#3B82F6', borderRadius: 6 }] },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('skillChart'), {
+      type: 'bar',
+      data: { labels: data.skills.map(s => s._id), datasets: [{ data: data.skills.map(s => s.count), backgroundColor: '#10B981', borderRadius: 6 }] },
+      options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('monthlyChart'), {
+      type: 'line',
+      data: { labels: data.monthly.map(m => `${m._id.m}/${m._id.y}`), datasets: [{ data: data.monthly.map(m => m.count), borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true, tension: 0.3 }] },
+      options: { plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('expChart'), {
+      type: 'doughnut',
+      data: { labels: data.experience.map(e => e._id), datasets: [{ data: data.experience.map(e => e.count), backgroundColor: palette }] },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('funnelChart'), {
+      type: 'bar',
+      data: {
+        labels: Object.keys(data.funnel),
+        datasets: [{ data: Object.values(data.funnel), backgroundColor: ['#3B82F6','#F59E0B','#10B981','#EF4444'], borderRadius: 6 }]
+      },
+      options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+    });
+  });
+</script>
+{% endblock %}
