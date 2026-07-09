@@ -4,7 +4,7 @@ dashboard has data to display immediately after setup.
 
 Usage:
     python seed_data.py
-<<<<<<< HEAD
+
 
 NOTE: `create_app()` is only called inside the `if __name__ == "__main__"`
 block below, deliberately. Keeping this file free of a top-level `app`
@@ -12,7 +12,7 @@ variable prevents deployment platforms (e.g. Vercel's Python builder) from
 mistaking this one-off seeding script for the real WSGI entrypoint — that
 entrypoint is `app.py`, which defines `app` at module level on purpose.
 =======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
+
 """
 from app import create_app
 from models.user_model import create_user
@@ -20,11 +20,10 @@ from models.resume_model import create_resume
 from datetime import datetime, timedelta
 import random
 
-<<<<<<< HEAD
-=======
+
 app = create_app()
 
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
+
 DEPARTMENTS = ["Engineering", "Design", "Product", "Marketing", "Sales", "HR"]
 SKILLS_POOL = ["Python", "JavaScript", "React", "SQL", "AWS", "Figma", "Docker",
                "Project Management", "SEO", "Salesforce", "Java", "Node.js"]
@@ -34,7 +33,6 @@ SAMPLE_NAMES = [
     "David Kim", "Priya Nair", "James Wilson", "Fatima Khan", "Lucas Silva",
 ]
 
-<<<<<<< HEAD
 
 def run_seed():
     app = create_app()
@@ -107,4 +105,4 @@ with app.app_context():
             print(f"Skipped {name}: {e}")
 
     print("Seed data created successfully.")
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
+

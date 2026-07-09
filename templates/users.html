@@ -24,10 +24,8 @@
           <td>{{ u.email }}</td>
           <td>
             <form method="POST" action="{{ url_for('admin.change_role', user_id=u._id) }}" class="d-inline">
-<<<<<<< HEAD
+
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
               <select name="role" class="form-select form-select-sm d-inline-block" style="width:auto;" onchange="this.form.submit()">
                 {% for r in roles %}
                 <option value="{{ r }}" {% if u.role == r %}selected{% endif %}>{{ r|capitalize }}</option>
@@ -40,10 +38,7 @@
             <div class="d-flex gap-1">
               <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#pwModal{{ u._id }}">Reset Password</button>
               <form method="POST" action="{{ url_for('admin.remove_user', user_id=u._id) }}" onsubmit="return confirm('Remove this user?')">
-<<<<<<< HEAD
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
                 <button type="submit" class="btn btn-sm btn-outline-secondary text-danger"><i class="fa-solid fa-trash"></i></button>
               </form>
             </div>
@@ -53,10 +48,8 @@
                   <div class="modal-body p-4">
                     <h6>Reset password for {{ u.name }}</h6>
                     <form method="POST" action="{{ url_for('admin.reset_password', user_id=u._id) }}">
-<<<<<<< HEAD
+
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
                       <input type="password" name="new_password" class="form-control my-2" placeholder="New password (min 8 chars)" required minlength="8">
                       <div class="d-flex justify-content-end gap-2 mt-2">
                         <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -82,10 +75,7 @@
   <div class="card-body d-flex flex-wrap gap-3 align-items-center">
     <a href="{{ url_for('admin.backup_database') }}" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-download me-1"></i>Download Backup</a>
     <form method="POST" action="{{ url_for('admin.restore_database') }}" enctype="multipart/form-data" class="d-flex gap-2">
-<<<<<<< HEAD
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
       <input type="file" name="backup_file" accept=".json" class="form-control form-control-sm">
       <button type="submit" class="btn btn-primary text-white btn-sm">Restore</button>
     </form>
@@ -99,10 +89,8 @@
       <div class="modal-body p-4">
         <h6 class="mb-3">Add New User</h6>
         <form method="POST" action="{{ url_for('admin.add_user') }}">
-<<<<<<< HEAD
+
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
           <div class="mb-2"><input type="text" name="name" class="form-control" placeholder="Full name" required></div>
           <div class="mb-2"><input type="email" name="email" class="form-control" placeholder="Email" required></div>
           <div class="mb-2"><input type="password" name="password" class="form-control" placeholder="Temporary password" required minlength="8"></div>

@@ -50,10 +50,7 @@
       <div class="card-header">Update Status</div>
       <div class="card-body">
         <form method="POST" action="{{ url_for('resume.update_status', resume_id=resume._id) }}" class="d-flex gap-2">
-<<<<<<< HEAD
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
           <select name="status" class="form-select form-select-sm">
             {% for s in ['New','Reviewed','Shortlisted','Rejected'] %}
             <option value="{{ s }}" {% if resume.status == s %}selected{% endif %}>{{ s }}</option>
@@ -110,10 +107,7 @@
         {% endfor %}
 
         <form method="POST" action="{{ url_for('resume.add_resume_note', resume_id=resume._id) }}" class="mt-2">
-<<<<<<< HEAD
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
           <div class="input-group">
             <input type="text" name="note" class="form-control" placeholder="Add a note about this candidate...">
             <button class="btn btn-primary text-white" type="submit">Add</button>
