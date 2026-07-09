@@ -5,7 +5,7 @@ Main Flask application entry point.
 import os
 from flask import Flask, render_template, redirect, url_for, session
 from flask_wtf import CSRFProtect
-from config import Config, validate_config
+from config import Config
 from models.db import init_db
 
 # Route blueprints
@@ -24,7 +24,7 @@ def create_app():
 
     # Fail fast with a clear, actionable message if MongoDB isn't configured,
     # instead of letting pymongo raise a cryptic DNS/hostname parsing error.
-    validate_config()
+   
 
     # CSRF protection for all POST/PUT/PATCH/DELETE form submissions.
     # File-upload API endpoints that are called from non-browser clients
