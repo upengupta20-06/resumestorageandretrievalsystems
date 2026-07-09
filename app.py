@@ -1,17 +1,11 @@
-from dotenv import load_dotenv
-
-load_dotenv()
 """
 Resume Storage and Retrieval System
 Main Flask application entry point.
 """
 import os
 from flask import Flask, render_template, redirect, url_for, session
-<<<<<<< HEAD
 from flask_wtf import CSRFProtect
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
-from config import Config
+from config import Config, validate_config
 from models.db import init_db
 
 # Route blueprints
@@ -28,7 +22,10 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-<<<<<<< HEAD
+    # Fail fast with a clear, actionable message if MongoDB isn't configured,
+    # instead of letting pymongo raise a cryptic DNS/hostname parsing error.
+    validate_config()
+
     # CSRF protection for all POST/PUT/PATCH/DELETE form submissions.
     # File-upload API endpoints that are called from non-browser clients
     # (if any are added later) can be exempted individually with
@@ -36,8 +33,6 @@ def create_app():
     csrf = CSRFProtect(app)
     app.csrf = csrf
 
-=======
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
     # Initialize MongoDB connection (attached to app.db)
     init_db(app)
 
@@ -73,7 +68,6 @@ def create_app():
     return app
 
 
-<<<<<<< HEAD
 # ---------------------------------------------------------------------
 # Module-level WSGI app instance.
 # Required by serverless/WSGI hosts (Vercel, Gunicorn, etc.) which import
@@ -83,9 +77,5 @@ app = create_app()
 
 
 if __name__ == "__main__":
-=======
-if __name__ == "__main__":
-    app = create_app()
->>>>>>> 6910ba463dd33db6a2340fd9a7a4732b3f75eb26
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=Config.DEBUG)
